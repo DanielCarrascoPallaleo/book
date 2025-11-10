@@ -29,14 +29,13 @@ class BookController extends Controller
     public function store(StoreRequest $request, BookService $service)
     {
         $service->store($request->validated());
-
-        return view('books.index');
+        
+        return to_route('books.index');
     }
 
-    public function delete(Book $book)
+    public function destroy(Book $book, BookService $service)
     {
-
-        $book = new BookService()->delete($book);
+        $service->delete($book);
 
         return to_route('books.index');
     }
@@ -49,7 +48,6 @@ class BookController extends Controller
     public function update(UpdateRequestBook $request, Book $book, BookService $service)
     {
         $dataValidada = $request->validated();
-
         $book = $service->update($book, $dataValidada);
 
         return to_route('books.index', compact('book'));
