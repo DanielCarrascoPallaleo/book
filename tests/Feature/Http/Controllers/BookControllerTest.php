@@ -8,8 +8,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-use function PHPUnit\Framework\assertNotEquals;
-
 #[Group('Books')]
 class BookControllerTest extends TestCase
 {
@@ -23,7 +21,7 @@ class BookControllerTest extends TestCase
     {
         // Arrange
         $books = Book::factory(10)->create([
-            'title' => 'MY LIBRO '.fake()->sentence()
+            'title' => 'MY LIBRO '.fake()->sentence(),
         ]);
         // Act
         $response = $this->get(route('books.index'));
@@ -42,7 +40,7 @@ class BookControllerTest extends TestCase
         $book = Book::factory()->create([
             'title' => fake()->sentence(),
         ]);
-        
+
         // Act
         $response = $this->get(route('books.show', $book->id));
 
@@ -52,41 +50,39 @@ class BookControllerTest extends TestCase
     }
 
     #[Test]
-    public function retorna_vista_create() :void{
-       $response = $this->get(route('books.create'));
-       $response->assertStatus(200); 
+    public function retorna_vista_create(): void
+    {
+        $response = $this->get(route('books.create'));
+        $response->assertStatus(200);
     }
 
-
     #[Test]
-    public function creo_una_instancia_libro_en_bd(): void {
+    public function creo_una_instancia_libro_en_bd(): void
+    {
         // arrange
         $title = 'titulo de un libro';
         $data['title'] = $title;
 
         // actions
         $response = $this->post(route('books.store', $data));
-  
+
         $BookCreated = Book::where('title', $title)->first();
 
-        $this->assertNotNull($BookCreated, "no hay libro");
+        $this->assertNotNull($BookCreated, 'no hay libro');
     }
 
-   #[Test]
-    public function elimino_una_instancia_libro_en_bd(): void{
-       // arrange
-        $data['title'] = 'titulo de un libro';
-
-        // actions
-        $this->post(route('books.store', $data));
-       
-        $book = Book::where('title', $data['title'])->first();
-        $this->assertNotNull($book);
+    #[Test]
+    public function elimino_una_instancia_libro_en_bd(): void
+    {
+        // Arrange
+        $book = Book::factory()->create([
+            'title' => 'titulo de un libro',
+        ]);
 
         // action
-        $this->delete(route('books.destroy', ['book' => $book]));
+        $this->delete(route('books.destroy',  $book));
 
-        //accert
+        // assert
         $this->assertDatabaseMissing('books', [
             'id' => $book->id,
         ]);
@@ -94,7 +90,8 @@ class BookControllerTest extends TestCase
     }
 
     #[Test]
-    public function actualizo_una_instancia_libro_en_bd(): void{
+    public function actualizo_una_instancia_libro_en_bd(): void
+    {
         // arrange
         $title = 'titulo de un libro';
         $tituloNuevo = 'el piter pan';
@@ -109,11 +106,9 @@ class BookControllerTest extends TestCase
         $BookUpdated = Book::where('title', $tituloNuevo)->first();
         $this->assertNotNull($BookUpdated);
 
-       
         $this->assertNotEquals($BookCreated->title, $BookUpdated->title);
-        //busco el libro con titulo nuevo
+        // busco el libro con titulo nuevo
         $this->assertNotNull($BookUpdated->title, 'no se actualizó!');
-
 
     }
 }
